@@ -8,7 +8,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
-    return view('home');
+
+    $noticias = Noticia::orderBy('id', 'desc')->paginate(6);
+    return view('home', compact('noticias'));
 })->name('home');
 
 Route::view('/teste', 'tela-teste');
@@ -24,7 +26,6 @@ Route::post(
         $user->password = $request->senha;
         $user->save();
         return redirect()->route('home');
-       
     }
 )->name('SalvarUsuario');
 
@@ -60,97 +61,94 @@ Route::get(
 
 
 Route::get('/gerencia-noticias',
-            function(){
-               $noticias = Noticia::orderBy('id','desc')->get();
-                return view('gerencia-noticias', compact('noticias'));
-            }
-        )->name('gerenciaNoticias');
+    function () {
+        $noticias = Noticia::orderBy('id', 'desc')->paginate(6);
+        return view('gerencia-noticias', compact('noticias'));
+    }
+)->name('gerenciaNoticias')->middleware('auth');
 
 
 Route::get(
     '/cadastra-noticia',
-        function(){
-           $noticia = new Noticia();
-            return view('cadastra-noticia', compact('noticia'));
-        }
-)->name('cadastraNoticia');
+    function () {
+        $noticia = new Noticia();
+        return view('cadastra-noticia', compact('noticia'));
+    }
+)->name('cadastraNoticia')->middleware('auth');
 
 Route::post(
     '/salva-noticia',
     function (Request $request) {
-    //  dd($request);
+        //  dd($request);
 
-    $noticia = new Noticia();
-    $noticia->titulo = $request->titulo;
-    $noticia->resumo = $request->resumo;
-    $noticia->capa   = $request->capa;
-    $noticia->conteudo = $request->conteudo;
+        $noticia = new Noticia();
+        $noticia->titulo = $request->titulo;
+        $noticia->resumo = $request->resumo;
+        $noticia->capa   = $request->capa;
+        $noticia->conteudo = $request->conteudo;
 
-    $noticia->data = now();
-    $noticia->user_id = Auth::id();
-    $noticia->save();
+        $noticia->data = now();
+        $noticia->user_id = Auth::id();
+        $noticia->save();
 
-    // $user = new User();
-    // $user->name = $request->nome;
-    //$user->email = $request->email;
-    //$user->password = $request->senha;
-    // $user->save();
+        // $user = new User();
+        // $user->name = $request->nome;
+        //$user->email = $request->email;
+        //$user->password = $request->senha;
+        // $user->save();
 
 
         return redirect()->route('gerenciaNoticias');
-       
     }
-)->name('SalvaNoticia');
+)->name('SalvaNoticia')->middleware('auth');
 
 Route::get(
     '/exibe-noticia/{noticia}',
-        function (Noticia $noticia) {
+    function (Noticia $noticia) {
 
-          // $noticia = Noticia::find($noticia);
+        // $noticia = Noticia::find($noticia);
 
-            return view('exibe-noticia', compact('noticia'));
-        }
+        return view('exibe-noticia', compact('noticia'));
+    }
 )->name('exibeNoticia');
 
 Route::get(
     '/edita-noticia/{noticia}',
-        function (Noticia $noticia) {
+    function (Noticia $noticia) {
 
-          // $noticia = Noticia::find($noticia);
+        // $noticia = Noticia::find($noticia);
 
-            return view('edita-noticia', compact('noticia'));
-        }
-)->name('editaNoticia');
+        return view('edita-noticia', compact('noticia'));
+    }
+)->name('editaNoticia')->middleware('auth');
 
 
 Route::post(
     '/altera-noticia/{noticia}',
     function (Request $request, Noticia $noticia) {
-    //  dd($request);
+        //  dd($request);
 
-   
-    $noticia->titulo = $request->titulo;
-    $noticia->resumo = $request->resumo;
-    $noticia->capa   = $request->capa;
-    $noticia->conteudo = $request->conteudo;
 
-    $noticia->data = now();
-    $noticia->user_id = Auth::id();
-    $noticia->save();
+        $noticia->titulo = $request->titulo;
+        $noticia->resumo = $request->resumo;
+        $noticia->capa   = $request->capa;
+        $noticia->conteudo = $request->conteudo;
 
-   
+        $noticia->data = now();
+        $noticia->user_id = Auth::id();
+        $noticia->save();
+
+
 
         return redirect()->route('gerenciaNoticias');
-       
     }
-)->name('alteraNoticia');
+)->name('alteraNoticia')->middleware('auth');
 
 Route::get(
     '/deleta-noticia/{noticia}',
-        function (Noticia $noticia) {
+    function (Noticia $noticia) {
 
-           $noticia->delete();
-           return redirect()->route('gerenciaNoticias');
-
-        }
-)->name('deletaNoticia');
+        $noticia->delete();
+        return redirect()->route('gerenciaNoticias');
+    }
+)->name('deletaNoticia')->middleware('auth');
