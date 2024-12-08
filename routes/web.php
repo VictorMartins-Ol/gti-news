@@ -152,3 +152,20 @@ Route::get(
         return redirect()->route('gerenciaNoticias');
     }
 )->name('deletaNoticia')->middleware('auth');
+
+Route::get('/sobre-curso', function () {
+    return view('sobre-curso');
+})->name('sobre-curso')->middleware('auth');
+
+
+Route::get('/alunos', function () {
+    return view('alunos');
+})->name('alunos')->middleware('auth');
+
+Route::get('/contato', function () {
+    return view('contato');
+})->name('contato')->middleware('auth');
+
+Route::get('/institucional', function () {
+    return view('institucional');
+})->name('institucional')->middleware('auth');
